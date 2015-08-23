@@ -20,18 +20,18 @@ class RecordIterator implements \Iterator
     protected $position;
 
     /**
-     * @var object Holds an instance of $this->className containing the current row of data
+     * @var object Holds an instance of->className containing the current row of data
      */
     protected $current;
 
     /**
      * @var int
-     *   Used by the current() method. Allows current() to be called multiple times
-     *   without advancing the cursor
+     *          Used by the current() method. Allows current() to be called multiple times
+     *          without advancing the cursor
      */
     protected $lastPosition;
-	
-	protected $chunkSize;
+
+    protected $chunkSize;
 
     /**
      * The constructor accepts the `$className`, `$statement`.
@@ -41,41 +41,43 @@ class RecordIterator implements \Iterator
      */
     public function __construct($stream, $chunkSize = 8192)
     {
-		if(!is_resource($stream)){
-			throw new ZipArchiveException('RecordIterator requires a valid file stream.');
-		}
+        if (!is_resource($stream)) {
+            throw new ZipArchiveException('RecordIterator requires a valid file stream.');
+        }
 
-		$this->chunkSize = $chunkSize;
+        $this->chunkSize = $chunkSize;
         $this->stream = $stream;
         $this->className = $className;
         $this->current = null;
         $this->position = 0;
         $this->lastPosition = -1;
-		
+
         $row = $this->fetchRow();
 
-		$this->headers = array_map(function ($a) {return trim(preg_replace('/[^a-zA-Z -_]/i', '', $a));}, $row);
+        $this->headers = array_map(function ($a) {return trim(preg_replace('/[^a-zA-Z -_]/i', '', $a));}, $row);
     }
-	
-	public function __destruct(){
-		if(is_resource($this->stream)) {
-			fclose($this->stream);
-		}
-	}
 
-	protected function fetchRow()
-	{
-		$row = fgetcsv($this->stream, $this->chunkSize);
+    public function __destruct()
+    {
+        if (is_resource($this->stream)) {
+            fclose($this->stream);
+        }
+    }
+
+    protected function fetchRow()
+    {
+        $row = fgetcsv($this->stream, $this->chunkSize);
         if (count($row) == 1) {
             throw new ZipArchiveException('Data does not appear to be valid CSV. Please check contents.');
         }
-		
-		$this->position += $this->chunkSize;
-		return array_map(function ($a) {return strlen(trim($a)) == 0 ? null : $a;}, $row);
-	}
+
+        $this->position += $this->chunkSize;
+
+        return array_map(function ($a) {return strlen(trim($a)) == 0 ? null : $a;}, $row);
+    }
 
     /**
-     * Returns the array containing field headers
+     * Returns the array containing field headers.
      *
      * @return array
      */
@@ -100,11 +102,11 @@ class RecordIterator implements \Iterator
             foreach ($this->fetchRow() as $key => $val) {
                 $data[$this->headers[$key]] = $val;
             }
-			
-			$this->current = new Models\Record();
-			foreach($data as $key => $value){
-				$this->current->setField($key, $value);
-			}
+
+            $this->current = new Models\Record();
+            foreach ($data as $key => $value) {
+                $this->current->setField($key, $value);
+            }
             $this->lastPosition = $this->position;
         }
 
@@ -130,7 +132,8 @@ class RecordIterator implements \Iterator
     public function next()
     {
         $this->position += $this->chunkSize;
-		return true;
+
+        return true;
     }
 
     /**
@@ -152,5 +155,4 @@ class RecordIterator implements \Iterator
     {
         return !feof($this->stream);
     }
-
 }

@@ -12,25 +12,25 @@ final class BackerArchive extends ZipArchiveExtended
 
     public function __construct($file)
     {
-
         $this->path = $file;
         if (($res = $this->open($this->path)) !== true) {
             throw new ZipArchiveException(
-                'Could not open file `'.$this->path.'`. Please check it is a valid Zip archive. Error Code: ' . $r
+                'Could not open file `'.$this->path.'`. Please check it is a valid Zip archive. Error Code: '.$r
             );
         }
 
         // Make sure the rewards array is populated
         $this->rewards();
-        
+
         // This will create the reward iterators
         $this->process();
-        
+
         return true;
     }
-    
-    public function __destruct() {
-        foreach(array_keys($this->rewards) as $rewardUid){
+
+    public function __destruct()
+    {
+        foreach (array_keys($this->rewards) as $rewardUid) {
             unset($this->rewards[$rewardUid]['reccords']);
         }
     }
@@ -43,17 +43,17 @@ final class BackerArchive extends ZipArchiveExtended
     private function process()
     {
         setlocale(LC_ALL, 'en_US.UTF8');
-        
+
         foreach ($this->files as $filename) {
             if (!($fp = $this->getStream($filename))) {
                 throw new ZipArchiveException("Unable to load file contents into stream. {$filename}");
             }
             $rewardName = $this->rewardNameFromFileName($filename);
             $rewardUid = $this->generateRewardUID($rewardName);
-            
+
             $this->rewards[$rewardUid]['records'] = new RecordIterator($fp);
         }
-        
+
         return true;
     }
 
@@ -74,11 +74,12 @@ final class BackerArchive extends ZipArchiveExtended
 
         return $this->rewards;
     }
-    
-    private function generateRewardUID($rewardName){
+
+    private function generateRewardUID($rewardName)
+    {
         return md5($rewardName);
     }
-    
+
     private function rewardNameFromFileName($filename)
     {
         return preg_replace_callback("/[^-]+\s+-\s+([^-]+).*/i", function ($match) {
