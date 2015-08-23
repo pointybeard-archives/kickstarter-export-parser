@@ -81,7 +81,7 @@ class Record extends AbstractModel
 		);
 	}
 	
-    private function generateRecordUID($recordName){
+    public function generateRecordUID($recordName){
         return md5($recordName);
     }
 	
