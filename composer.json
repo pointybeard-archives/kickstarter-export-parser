@@ -1,0 +1,29 @@
+{
+    "name": "pointybeard/kickstarter-export-parser",
+    "description": "A PHP library for opening and parsing backer exports from Kickstarter campaigns.",
+    "type": "utility",
+    "keywords": ["kickstarter", "archive", "import", "parser"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alistair Kearney",
+            "email": "hi@alistairkearney.com",
+            "homepage": "http://alistairkearney.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.6"
+    },
+    "support": {
+      "issues": "https://github.com/pointybeard/kickstarter-export-parser/issues",
+      "wiki": "https://github.com/pointybeard/kickstarter-export-parser/wiki"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "classmap": ["src/Lib"],
+        "psr-4": {
+            "pointybeard\\Kickstarter\\ExportParser\\": "src/"
+        }
+    }
+}
