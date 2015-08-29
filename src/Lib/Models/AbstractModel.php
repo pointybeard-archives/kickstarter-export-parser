@@ -2,6 +2,6 @@
 
 namespace pointybeard\Kickstarter\ExportParser\Lib\Models;
 
-abstract class AbstactModel
+abstract class AbstractModel
 {
 }

@@ -13,17 +13,19 @@
         }
     ],
     "require": {
-        "php": ">=5.6.6"
-    },
+        "php": ">=5.6.6",
+        "fzaninotto/faker": "^1.5"
+	},
     "support": {
       "issues": "https://github.com/pointybeard/kickstarter-export-parser/issues",
       "wiki": "https://github.com/pointybeard/kickstarter-export-parser/wiki"
     },
     "minimum-stability": "stable",
     "autoload": {
-        "classmap": ["src/Lib"],
+        "classmap": ["src/Lib", "tests/seeders"],
         "psr-4": {
-            "pointybeard\\Kickstarter\\ExportParser\\": "src/"
+            "pointybeard\\Kickstarter\\ExportParser\\": "src/",
+            "pointybeard\\Kickstarter\\ExportParser\\Tests\\Seeders\\": "tests/seeders/"
         }
     }
 }

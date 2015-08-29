@@ -1,7 +1,6 @@
 <?php
 
 namespace pointybeard\Kickstarter\ExportParser\Lib;
-
 use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 
 final class BackerArchive extends ZipArchiveExtended
@@ -15,7 +14,7 @@ final class BackerArchive extends ZipArchiveExtended
         $this->path = $file;
         if (($res = $this->open($this->path)) !== true) {
             throw new ZipArchiveException(
-                'Could not open file `'.$this->path.'`. Please check it is a valid Zip archive. Error Code: '.$r
+                'Could not open file `'.$this->path.'`. Please check it is a valid Zip archive. Error Code: '.$res
             );
         }
 

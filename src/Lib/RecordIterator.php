@@ -1,6 +1,7 @@
 <?php
 
 namespace pointybeard\Kickstarter\ExportParser\Lib;
+use pointybeard\Kickstarter\ExportParser\Lib\Exceptions;
 
 class RecordIterator implements \Iterator
 {
@@ -42,12 +43,11 @@ class RecordIterator implements \Iterator
     public function __construct($stream, $chunkSize = 8192)
     {
         if (!is_resource($stream)) {
-            throw new ZipArchiveException('RecordIterator requires a valid file stream.');
+            throw new Exceptions\ZipArchiveException('RecordIterator requires a valid file stream.');
         }
 
         $this->chunkSize = $chunkSize;
         $this->stream = $stream;
-        $this->className = $className;
         $this->current = null;
         $this->position = 0;
         $this->lastPosition = -1;
@@ -68,7 +68,7 @@ class RecordIterator implements \Iterator
     {
         $row = fgetcsv($this->stream, $this->chunkSize);
         if (count($row) == 1) {
-            throw new ZipArchiveException('Data does not appear to be valid CSV. Please check contents.');
+            throw new Exceptions\ZipArchiveException('Data does not appear to be valid CSV. Please check contents.');
         }
 
         $this->position += $this->chunkSize;
