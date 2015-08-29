@@ -1,19 +1,11 @@
 <?php
 namespace pointybeard\Kickstarter\ExportParser;
+use pointybeard\Kickstarter\ExportParser\Lib;
 use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 use pointybeard\Kickstarter\ExportParser\Tests\Seeders;
 
 class BackerArchiveTest extends \PHPUnit_Framework_TestCase
 {
-	
-	/**
-	 * This can be used to generate new, valid, CSV data.
-	 */
-	//public static function setUpBeforeClass(){
-	//	$archiveSeeder = new Seeders\generateValidData();
-	//	$archiveSeeder->createValidCSVArchive(__DIR__ . '/archives/valid-csv-test.zip');
-	//}
-	
 	/**
 	 * Simple test to load up a valid ZIP archive into the BackerArchive object
 	 */
@@ -60,11 +52,7 @@ class BackerArchiveTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testIterateOverRecords($archive){
 	    foreach ($archive->rewards() as $r) {
-	        do {
-	            $record = $r['records']->current();
-				// We're not testing the actual contents, just that we can iterate over and each record loads up
-	            $r['records']->next();
-	        } while ($r['records']->valid());
+			$this->assertTrue($r['records'] instanceof Lib\RecordIterator);
 	    }
 	    $archive->close();
 	}
