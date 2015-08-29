@@ -10,21 +10,26 @@ class generateValidData
     }
 
     public function createValidCSVArchive($path, $totalRowsWithSurvey=50, $totalRowsWithoutSurvey=50){
+
         $zip = new \ZipArchive;
         $res = $zip->open($path, \ZipArchive::CREATE);
         if ($res !== TRUE) {
             throw new \Exception('Failed to open zip archive.');
         }
 
-        $zip->addFile(
-            $this->testGenerateDataForTestsWithSurvey($totalRowsWithSurvey),
-            'Kickstarter Backer Report - $59 - Aug 18 07am.csv'
-        );
-        
-        $zip->addFile(
-            $this->testGenerateDataForTestsNoSurvey($totalRowsWithoutSurvey),
-            'Kickstarter Backer Report - No reward - Aug 18 07am.csv'
-        );
+        if($totalRowsWithSurvey > 0) {
+            $zip->addFile(
+                $this->testGenerateDataForTestsWithSurvey($totalRowsWithSurvey),
+                'Kickstarter Backer Report - $59 - Aug 18 07am.csv'
+            );
+        }
+
+        if($totalRowsWithoutSurvey > 0) {
+            $zip->addFile(
+                $this->testGenerateDataForTestsNoSurvey($totalRowsWithoutSurvey),
+                'Kickstarter Backer Report - No reward - Aug 18 07am.csv'
+            );
+        }
 
         $zip->close();
         
