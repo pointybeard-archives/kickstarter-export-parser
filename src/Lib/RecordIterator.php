@@ -16,14 +16,19 @@ class RecordIterator implements \Iterator
     protected $headers;
 
     /**
-     * @var int Tracks which row in the data we are up to
+     * @var int Tracks offset (in bytes) into the file
      */
     protected $position;
 
     /**
-     * @var object Holds an instance of->className containing the current row of data
+     * @var object Holds an instance of Models\Record containing the current row of data
      */
     protected $current;
+
+    /**
+     * @var array Holds the raw data as parsed by fetchRow, but before it is injected into Models\Record instance
+     */
+    protected $currentRaw;
 
     /**
      * @var int
@@ -35,10 +40,10 @@ class RecordIterator implements \Iterator
     protected $chunkSize;
 
     /**
-     * The constructor accepts the `$className`, `$statement`.
+     * The constructoR accepts stream into file in the zip archive
      *
-     * @param string        $className
-     * @param \PDOStatement $statement
+     * @param resource        $stream
+     * @param int $chunkSize
      */
     public function __construct($stream, $chunkSize = 8192)
     {
@@ -90,27 +95,28 @@ class RecordIterator implements \Iterator
      * Create a new instance of $this->className and by calling
      * the fetch() method on $this->statement;.
      *
+	 * @param boolean $returnObject If set to false, this will return currentRaw instead of Models\Record instance
      * @return object
      */
-    public function current()
+    public function current($returnObject=true)
     {
         // Check if the lastPosition is different to the current position.
         // If it is, then get a new object and update lastPosition.
         if ($this->lastPosition !== $this->position) {
             // Not always same number of data to headers due to survey not being completed by some members.
-            $data = [];
+            $this->currentRaw = [];
             foreach ($this->fetchRow() as $key => $val) {
-                $data[$this->headers[$key]] = $val;
+                $this->currentRaw[$this->headers[$key]] = $val;
             }
 
             $this->current = new Models\Record();
-            foreach ($data as $key => $value) {
+            foreach ($this->currentRaw as $key => $value) {
                 $this->current->setField($key, $value);
             }
             $this->lastPosition = $this->position;
         }
 
-        return $this->current;
+        return ($returnObject ? $this->current : $this->currentRaw);
     }
 
     /**
