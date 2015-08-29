@@ -84,6 +84,19 @@ class Record extends AbstractModel
         );
     }
 
+    public function toArray(){
+        return [
+            'basic' => $this->properties->basic,
+            'survey' => $this->properties->survey,
+            'custom' => $this->properties->custom
+        ];
+    }
+
+    public function toJson()
+    {
+        return json_encode($this->toArray(), JSON_PRETTY_PRINT);
+    }
+
     public function generateRecordUID($recordName)
     {
         return md5($recordName);
