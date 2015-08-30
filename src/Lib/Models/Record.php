@@ -145,7 +145,7 @@ class Record extends AbstractModel
 
         foreach ($addressFields as $field) {
             $key = self::serialise($field);
-            $address[ltrim($key, 'Shipping')] = $this->properties->survey[$key]['value'];
+            $address[preg_replace('/^Shipping/', '', $key)] = $this->properties->survey[$key]['value'];
         }
 
         return (object) $address;
