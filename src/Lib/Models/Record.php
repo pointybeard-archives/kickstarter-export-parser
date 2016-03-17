@@ -104,7 +104,8 @@ class Record extends AbstractModel
 
     public function __isset($name)
     {
-        return array_key_exists($name, $this->properties);
+        return array_key_exists($name, $this->properties->basic) ||
+        array_key_exists($name, $this->properties->survey);
     }
 
     public static function serialise($value)

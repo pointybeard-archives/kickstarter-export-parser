@@ -66,4 +66,15 @@ class RecordIteratorTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($json_decoded->survey instanceof \StdClass, 'Unable to locate ->survey of decoded record.');
 		
 	}
+
+	/**
+	 * @depends testIterateOverRecords
+	 * @param Lib/Models/Record $record
+	 */
+	public function testRecordIsSet($record){
+
+		$this->assertTrue(isset($record->BackerName), 'Basic value should be set');
+		$this->assertTrue(isset($record->RewardMinimum), 'Survey value should be set');
+		$this->assertFalse(isset($record->MissingKey), 'Missing key should not should be set');
+	}
 }
