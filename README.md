@@ -1,6 +1,8 @@
 Kickstarter Export Parser
 ===========
 
+[![Latest Stable Version](https://poser.pugx.org/pointybeard/kickstarter-export-parser/v/stable)](https://packagist.org/packages/pointybeard/kickstarter-export-parser) [![Total Downloads](https://poser.pugx.org/pointybeard/kickstarter-export-parser/downloads)](https://packagist.org/packages/pointybeard/kickstarter-export-parser) [![License](https://poser.pugx.org/pointybeard/kickstarter-export-parser/license)](https://packagist.org/packages/pointybeard/kickstarter-export-parser)
+
 Opens a zip file downloaded form Kickstarter and parses it for consumption by PHP
 
 ## Features
