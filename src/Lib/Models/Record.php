@@ -21,6 +21,7 @@ class Record extends AbstractModel
 
     private static $commonSurveyFields = [
         'Reward Minimum',
+        'Reward ID',
         'Rewards Sent?',
         'Survey Response',
         'Shipping Country',
