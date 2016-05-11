@@ -116,15 +116,15 @@ class Record extends AbstractModel
 
     public function hasAnsweredSurvey()
     {
-        return isset($this->properties->survey['SurveyResponse']) && !empty($this->properties->survey['SurveyResponse']);
+        return isset($this->SurveyResponse) && !empty($this->SurveyResponse);
     }
 
     public function hasAddress()
     {
         return (
             $this->hasAnsweredSurvey()
-            && isset($this->properties->survey['ShippingCountryCode'])
-            && !empty($this->properties->survey['ShippingCountryCode'])
+            && isset($this->ShippingCountryCode)
+            && !empty($this->ShippingCountryCode)
         );
     }
 
@@ -147,7 +147,7 @@ class Record extends AbstractModel
 
         foreach ($addressFields as $field) {
             $key = self::serialise($field);
-            $address[preg_replace('/^Shipping/', '', $key)] = $this->properties->survey[$key]['value'];
+            $address[preg_replace('/^Shipping/', '', $key)] = $this->$key;
         }
 
         return (object) $address;
