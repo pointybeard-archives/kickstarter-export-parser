@@ -81,8 +81,9 @@ final class BackerArchive extends ZipArchiveExtended
 
     private function rewardNameFromFileName($filename)
     {
-        return preg_replace_callback("/[^-]+\s+-\s+([^-]+).*/i", function ($match) {
-            return trim($match[1]);
-        }, $filename);
+        // Removed the code that does the reward extraction as it is causing
+        // issues when Kickstarter change their filename formatting (fixes #4)
+        // https://github.com/pointybeard/kickstarter-export-parser/issues/4
+        return $filename;
     }
 }
