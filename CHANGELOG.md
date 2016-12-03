@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.0.9
+* BackerArchive::rewardNameFromFileName() now returns the full filename instead of trying to parse it out. Still keeping rewardNameFromFileName as abstracted method for now. (Fixes #4)
+* Added 'Reward Title' to list of fields (Fixes #5)
+
+## 1.0.8
+* Record class is no longer accessing the properties array directly in hasAnsweredSurvey, hasAddress and getAddress
+
+## 1.0.7
+* Updated for new field 'Reward ID'
+
+## 1.0.6
+* Fix `__isset` implementation (thetamind)
+
+## 1.0.5
+* Fixed bug when preparing data in Models\Record::getAddress() method. 'ShippingState' was being cut down to just 'tate'
+
 ## 1.0.4
 
 * Small tweaks to BackerArchiveTest
