@@ -34,6 +34,9 @@ class Record extends AbstractModel
         'Shipping Postal Code',
         'Shipping Country Name',
         'Shipping Country Code',
+        // Kickstarter added a new field 'Reward Title' to the backer export data (fixes #5)
+        // https://github.com/pointybeard/kickstarter-export-parser/issues/5
+        'Reward Title',
     ];
 
     public function __construct()
