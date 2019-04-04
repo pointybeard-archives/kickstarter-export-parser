@@ -1,21 +1,24 @@
 <?php
 
 namespace pointybeard\Kickstarter\ExportParser\Lib;
+
 use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 
-final class BackerArchive extends ZipArchiveExtended
+class BackerArchive extends ZipArchiveExtended
 {
-    private $rewards = null;
-    private $files = [];
-    private $path = null;
+    protected $rewards = null;
+    protected $files = [];
+    protected $path = null;
 
     public function __construct($file)
     {
         $this->path = $file;
         if (($res = $this->open($this->path)) !== true) {
-            throw new ZipArchiveException(
-                'Could not open file `'.$this->path.'`. Please check it is a valid Zip archive. Error Code: '.$res
-            );
+            throw new ZipArchiveException(sprintf(
+                'Could not open file `%s`. Please check it is a valid Zip archive. Error Code: %s',
+                $this->path,
+                $res
+            ));
         }
 
         // Make sure the rewards array is populated
@@ -34,18 +37,18 @@ final class BackerArchive extends ZipArchiveExtended
         }
     }
 
-    public function getArchivePath()
+    public function getArchivePath() : string
     {
         return $this->path;
     }
 
-    private function process()
+    protected function process() : bool
     {
         setlocale(LC_ALL, 'en_US.UTF8');
 
         foreach ($this->files as $filename) {
             if (!($fp = $this->getStream($filename))) {
-                throw new ZipArchiveException("Unable to load file contents into stream. {$filename}");
+                throw new ZipArchiveException("Unable to load contents of {$filename} into stream.");
             }
             $rewardName = $this->rewardNameFromFileName($filename);
             $rewardUid = $this->generateRewardUID($rewardName);
@@ -56,7 +59,7 @@ final class BackerArchive extends ZipArchiveExtended
         return true;
     }
 
-    public function rewards()
+    public function rewards() : array
     {
         if (is_null($this->rewards)) {
             $this->rewards = [];
@@ -74,12 +77,12 @@ final class BackerArchive extends ZipArchiveExtended
         return $this->rewards;
     }
 
-    private function generateRewardUID($rewardName)
+    protected function generateRewardUID($rewardName) : string
     {
         return md5($rewardName);
     }
 
-    private function rewardNameFromFileName($filename)
+    protected function rewardNameFromFileName($filename) : string
     {
         // Removed the code that does the reward extraction as it is causing
         // issues when Kickstarter change their filename formatting (fixes #4)

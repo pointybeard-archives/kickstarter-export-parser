@@ -88,7 +88,8 @@ class Record extends AbstractModel
         );
     }
 
-    public function toArray(){
+    public function toArray()
+    {
         return [
             'basic' => $this->properties->basic,
             'survey' => $this->properties->survey,

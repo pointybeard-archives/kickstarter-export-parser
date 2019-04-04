@@ -16,7 +16,7 @@ class ZipArchiveExtended extends \ZipArchive
      *
      * @return int
      */
-    public function count()
+    public function count() : int
     {
         $count = 0;
         while ($this->statIndex($count) !== false) {
