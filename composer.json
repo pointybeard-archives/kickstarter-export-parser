@@ -6,29 +6,31 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Alistair Kearney",
-            "email": "hi@alistairkearney.com",
-            "homepage": "http://alistairkearney.com",
+            "name": "Alannah Kearney",
+            "email": "hi@alannahkearney.com",
+            "homepage": "http://alannahkearney.com",
             "role": "Developer"
         }
     ],
-    "require": {
-        "php": ">=5.6.6"
-	},
     "support": {
       "issues": "https://github.com/pointybeard/kickstarter-export-parser/issues",
       "wiki": "https://github.com/pointybeard/kickstarter-export-parser/wiki"
     },
+    "require": {
+        "php": ">=7.3"
+	},
+    "require-dev": {
+        "fzaninotto/faker": "dev-master",
+        "phpunit/phpunit": "^8"
+    },
+    "suggest": {
+        "ext-zlib": "Requires ext-zlib extension"
+    },
     "minimum-stability": "stable",
     "autoload": {
-        "classmap": ["src/Lib", "tests/seeders"],
         "psr-4": {
             "pointybeard\\Kickstarter\\ExportParser\\": "src/",
             "pointybeard\\Kickstarter\\ExportParser\\Tests\\Seeders\\": "tests/seeders/"
         }
-    },
-    "require-dev": {
-        "fzaninotto/faker": "^1.5",
-        "phpunit/phpunit": "5.0.*"
     }
 }
