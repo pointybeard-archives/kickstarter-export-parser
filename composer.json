@@ -33,6 +33,9 @@
         "psr-4": {
             "pointybeard\\Kickstarter\\ExportParser\\": "src/",
             "pointybeard\\Kickstarter\\ExportParser\\Tests\\Seeders\\": "tests/seeders/"
-        }
+        },
+        "files": [
+            "src/Includes/Functions.php"
+        ]
     }
 }
