@@ -103,7 +103,7 @@ class Record extends AbstractModel
         $it->append(new \ArrayIterator($this->properties->survey));
         $it->append(new \ArrayIterator($this->properties->custom));
 
-        foreach($it as $item) {
+        foreach ($it as $item) {
             $result[$item['name']] = $item['value'];
         }
 
@@ -115,39 +115,39 @@ class Record extends AbstractModel
         return json_encode($this->toArray(), JSON_PRETTY_PRINT);
     }
 
-    public function __toString() {
-        return implode(", ", array_walk($this->toArray(), function($item, $key) {
+    public function __toString()
+    {
+        return implode(", ", array_walk($this->toArray(), function ($item, $key) {
             return sprintf("%s: %s", $key, $item);
         }));
     }
 
-    public function toCsv($fp, $includeHeaders=false, $headers=null) : bool{
-
+    public function toCsv($fp, $includeHeaders=false, $headers=null) : bool
+    {
         $headers = $headers == null
             ? array_merge(self::$basicFields, self::$commonSurveyFields)
             : $headers
         ;
 
         $data = [];
-        foreach($headers as $field) {
+        foreach ($headers as $field) {
             $seralized = self::serialise($field);
             $data[] = $this->$seralized;
         }
 
         // Add custom (survey) fields
-        if(in_array('Survey Response', $headers)) {
-            foreach($this->properties->custom as $uid => $q) {
+        if (in_array('Survey Response', $headers)) {
+            foreach ($this->properties->custom as $uid => $q) {
                 $headers[] = $q['question'];
                 $data[] = $q['answer'];
             }
         }
 
-        if($includeHeaders == true) {
+        if ($includeHeaders == true) {
             fputcsv($fp, $headers);
         }
 
         return fputcsv($fp, $data) === false;
-
     }
 
     public function generateRecordUID($recordName) : string

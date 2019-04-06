@@ -1,17 +1,18 @@
 <?php
 
-if(!function_exists("cleanKickstarterCurrencyAmount")) {
-    function cleanKickstarterCurrencyAmount($amount) : float {
+if (!function_exists("cleanKickstarterCurrencyAmount")) {
+    function cleanKickstarterCurrencyAmount($amount) : float
+    {
         return (float)preg_replace("@^[^\d]+@", '', $amount);
     }
 }
 
-if(!function_exists("array_merge_sum")) {
+if (!function_exists("array_merge_sum")) {
     function array_merge_sum(array $array1, array $array2) : array
     {
         $keys = array_unique(array_merge(array_keys($array1), array_keys($array2)));
         $result = [];
-        foreach($keys as $k) {
+        foreach ($keys as $k) {
             $result[$k] =
                 (isset($array1[$k]) ? $array1[$k] : 0.0) +
                 (isset($array2[$k]) ? $array2[$k] : 0.0)
@@ -21,7 +22,7 @@ if(!function_exists("array_merge_sum")) {
     }
 }
 
-if(!function_exists("formatNumberToSafeCurrency")) {
+if (!function_exists("formatNumberToSafeCurrency")) {
     function formatNumberToSafeCurrency($number)
     {
         // The point of this method is to remove strange leftover floating point
