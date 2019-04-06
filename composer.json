@@ -17,7 +17,9 @@
       "wiki": "https://github.com/pointybeard/kickstarter-export-parser/wiki"
     },
     "require": {
-        "php": ">=7.3"
+        "php": ">=7.2",
+        "pointybeard/property-bag": "^1.0",
+        "pointybeard/php-cli-lib": "^1.1"
 	},
     "require-dev": {
         "fzaninotto/faker": "dev-master",
