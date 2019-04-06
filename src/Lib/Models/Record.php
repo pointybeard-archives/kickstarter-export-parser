@@ -24,8 +24,8 @@ class Record extends AbstractModel
         'Reward ID',
         'Rewards Sent?',
         'Survey Response',
-        'Shipping Country',
-        'Shipping Amount',
+        "Shipping Country",
+        "Shipping Amount",
         'Shipping Name',
         'Shipping Address 1',
         'Shipping Address 2',
@@ -37,6 +37,10 @@ class Record extends AbstractModel
         // Kickstarter added a new field 'Reward Title' to the backer export data (fixes #5)
         // https://github.com/pointybeard/kickstarter-export-parser/issues/5
         'Reward Title',
+        // Kickstarter added fields 'Shipping Phone Number' and 'Shipping Delivery Notes'
+        // to the backer export data
+        'Shipping Phone Number',
+        'Shipping Delivery Notes',
     ];
 
     public function __construct()
@@ -48,7 +52,7 @@ class Record extends AbstractModel
         ];
     }
 
-    public function setField($name, $value)
+    public function setField($name, $value) : self
     {
 
         // Basic Fields
@@ -72,6 +76,8 @@ class Record extends AbstractModel
                 'answer' => $value,
             ];
         }
+
+        return $this;
     }
 
     public function __get($name)
@@ -88,21 +94,63 @@ class Record extends AbstractModel
         );
     }
 
-    public function toArray()
+    public function toArray() : array
     {
-        return [
-            'basic' => $this->properties->basic,
-            'survey' => $this->properties->survey,
-            'custom' => $this->properties->custom
-        ];
+        $result = [];
+
+        $it = new \AppendIterator;
+        $it->append(new \ArrayIterator($this->properties->basic));
+        $it->append(new \ArrayIterator($this->properties->survey));
+        $it->append(new \ArrayIterator($this->properties->custom));
+
+        foreach($it as $item) {
+            $result[$item['name']] = $item['value'];
+        }
+
+        return $result;
     }
 
-    public function toJson()
+    public function toJson() : string
     {
         return json_encode($this->toArray(), JSON_PRETTY_PRINT);
     }
 
-    public function generateRecordUID($recordName)
+    public function __toString() {
+        return implode(", ", array_walk($this->toArray(), function($item, $key) {
+            return sprintf("%s: %s", $key, $item);
+        }));
+    }
+
+    public function toCsv($fp, $includeHeaders=false, $headers=null) : bool{
+
+        $headers = $headers == null
+            ? array_merge(self::$basicFields, self::$commonSurveyFields)
+            : $headers
+        ;
+
+        $data = [];
+        foreach($headers as $field) {
+            $seralized = self::serialise($field);
+            $data[] = $this->$seralized;
+        }
+
+        // Add custom (survey) fields
+        if(in_array('Survey Response', $headers)) {
+            foreach($this->properties->custom as $uid => $q) {
+                $headers[] = $q['question'];
+                $data[] = $q['answer'];
+            }
+        }
+
+        if($includeHeaders == true) {
+            fputcsv($fp, $headers);
+        }
+
+        return fputcsv($fp, $data) === false;
+
+    }
+
+    public function generateRecordUID($recordName) : string
     {
         return md5($recordName);
     }
@@ -113,17 +161,17 @@ class Record extends AbstractModel
         array_key_exists($name, $this->properties->survey);
     }
 
-    public static function serialise($value)
+    public static function serialise($value) : string
     {
         return preg_replace('@[^a-zA-Z0-9]@', '', $value);
     }
 
-    public function hasAnsweredSurvey()
+    public function hasAnsweredSurvey() : bool
     {
         return isset($this->SurveyResponse) && !empty($this->SurveyResponse);
     }
 
-    public function hasAddress()
+    public function hasAddress() : bool
     {
         return (
             $this->hasAnsweredSurvey()
@@ -132,12 +180,14 @@ class Record extends AbstractModel
         );
     }
 
-    public function getAddress()
+    public function getAddress() : ?object
     {
         if (!$this->hasAddress()) {
-            return false;
+            return null;
         }
+
         $address = [];
+
         $addressFields = [
             'Shipping Name',
             'Shipping Address 1',
@@ -157,10 +207,10 @@ class Record extends AbstractModel
         return (object) $address;
     }
 
-    public function getSurveyAnswers()
+    public function getSurveyAnswers() : array
     {
         if (!$this->hasAnsweredSurvey()) {
-            return false;
+            return [];
         }
 
         return $this->properties->custom;
