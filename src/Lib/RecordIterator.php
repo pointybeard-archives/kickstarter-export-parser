@@ -69,6 +69,10 @@ class RecordIterator implements \Iterator
         }
     }
 
+    public function stream() {
+        return $this->stream;
+    }
+
     protected function fetchRow()
     {
         $row = fgetcsv($this->stream, $this->chunkSize);
