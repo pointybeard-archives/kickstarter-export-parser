@@ -13,14 +13,16 @@ class Question extends AbstractModel
         ];
     }
 
-    public function addOption($value) {
-        if(!is_array($this->properties->options)) {
+    public function addOption($value)
+    {
+        if (!is_array($this->properties->options)) {
             $this->properties->options = [];
         }
         $this->properties->options[] = $value;
     }
 
-    public function options() {
+    public function options()
+    {
         return $this->properties->options;
     }
 
@@ -28,5 +30,4 @@ class Question extends AbstractModel
     {
         return md5($this->properties->original);
     }
-
 }

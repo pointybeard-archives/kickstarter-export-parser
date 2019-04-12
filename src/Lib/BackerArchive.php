@@ -1,6 +1,7 @@
 <?php
 
 namespace pointybeard\Kickstarter\ExportParser\Lib;
+
 use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 
 final class BackerArchive extends ZipArchiveExtended
@@ -22,7 +23,7 @@ final class BackerArchive extends ZipArchiveExtended
 
     public function __destruct()
     {
-        for($ii = 0; $ii < count($this->rewards); $ii++) {
+        for ($ii = 0; $ii < count($this->rewards); $ii++) {
             unset($this->rewards[$ii]->records);
         }
     }
@@ -59,10 +60,10 @@ final class BackerArchive extends ZipArchiveExtended
         return $this->rewards;
     }
 
-    public function & findRewardByUUID($uuid) {
-
-        for($ii = 0; $ii < count($this->rewards()); $ii++){
-            if($this->rewards[$ii]->UUID() == $uuid) {
+    public function & findRewardByUUID($uuid)
+    {
+        for ($ii = 0; $ii < count($this->rewards()); $ii++) {
+            if ($this->rewards[$ii]->UUID() == $uuid) {
                 return $this->rewards[$ii];
             }
         }
@@ -70,13 +71,14 @@ final class BackerArchive extends ZipArchiveExtended
         return null;
     }
 
-    public function toArray() {
+    public function toArray()
+    {
         $result = [
             "path" => $this->path,
             "rewards" => []
         ];
 
-        foreach($this->rewards() as $r) {
+        foreach ($this->rewards() as $r) {
             $result['rewards'][] = $r->toArray();
         }
 

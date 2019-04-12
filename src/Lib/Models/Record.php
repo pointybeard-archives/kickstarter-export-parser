@@ -4,7 +4,6 @@ namespace pointybeard\Kickstarter\ExportParser\Lib\Models;
 
 final class Record extends AbstractModel
 {
-
     private static $currencyFields = [
         'Pledge Amount', 'Reward Minimum', 'Shipping Amount'
     ];
@@ -53,8 +52,7 @@ final class Record extends AbstractModel
 
     public function setField($name, $value)
     {
-
-        if(!is_numeric($value) && in_array($name, self::$currencyFields)) {
+        if (!is_numeric($value) && in_array($name, self::$currencyFields)) {
             $value = self::convertRawKickstarterCurrencyString($value);
         }
 
@@ -95,7 +93,8 @@ final class Record extends AbstractModel
         );
     }
 
-    public function toArray(){
+    public function toArray()
+    {
         return [
             'basic' => $this->properties->basic,
             'survey' => $this->properties->survey,

@@ -5,26 +5,27 @@ class generateValidData
 {
     private static $faker;
 
-    public function __construct(){
+    public function __construct()
+    {
         self::$faker = \Faker\Factory::create('en_AU');
     }
 
-    public function createValidCSVArchive($path, $totalRowsWithSurvey=50, $totalRowsWithoutSurvey=50){
-
+    public function createValidCSVArchive($path, $totalRowsWithSurvey=50, $totalRowsWithoutSurvey=50)
+    {
         $zip = new \ZipArchive;
         $res = $zip->open($path, \ZipArchive::CREATE);
-        if ($res !== TRUE) {
+        if ($res !== true) {
             throw new \Exception('Failed to open zip archive.');
         }
 
-        if($totalRowsWithSurvey > 0) {
+        if ($totalRowsWithSurvey > 0) {
             $zip->addFile(
                 $this->testGenerateDataForTestsWithSurvey($totalRowsWithSurvey),
                 'Kickstarter Backer Report - $59 - Aug 18 07am.csv'
             );
         }
 
-        if($totalRowsWithoutSurvey > 0) {
+        if ($totalRowsWithoutSurvey > 0) {
             $zip->addFile(
                 $this->testGenerateDataForTestsNoSurvey($totalRowsWithoutSurvey),
                 'Kickstarter Backer Report - No reward - Aug 18 07am.csv'
@@ -32,17 +33,18 @@ class generateValidData
         }
 
         $zip->close();
-        
+
         return true;
     }
 
-    public function testGenerateDataForTestsWithSurvey($total=50){
+    public function testGenerateDataForTestsWithSurvey($total=50)
+    {
         $tmpFile = tempnam(sys_get_temp_dir(), 'ks_parser');
         $fp = fopen($tmpFile, 'w');
 
         fputcsv($fp, ["Backer Number", "Backer UID", "Backer Name", "Email", "Shipping Country", "Shipping Amount", "Reward Minimum", "Pledge Amount", "Pledged At", "Rewards Sent?", "Pledged Status", "Notes", "Billing State/Province", "Billing Country", "Survey Response", "Shipping Name", "Shipping Address 1", "Shipping Address 2", "Shipping City", "Shipping State", "Shipping Postal Code", "Shipping Country Name", "Shipping Country Code", "What Is Your Contact Phone Number?", "Add On: How Many Additional Copies Did You Pledge For?", "What Is Your Region/Continent?"]);
 
-        for($ii = 0; $ii < $total; $ii++){
+        for ($ii = 0; $ii < $total; $ii++) {
             fputcsv($fp, [
                 "Backer Number" => self::$faker->numberBetween(1, 9999),
                 "Backer UID" => self::$faker->randomNumber(9),
@@ -71,20 +73,20 @@ class generateValidData
                 "Add On: How Many Additional Copies Did You Pledge For?" => self::$faker->numberBetween(0, 4),
                 "What Is Your Region/Continent?" => self::$faker->randomElement(['United States', 'Europe', 'Asia/Oceania', 'Other'])
             ]);
-        }    
+        }
 
         fclose($fp);
         return $tmpFile;
     }
 
-    public function testGenerateDataForTestsNoSurvey($total=50){
-
+    public function testGenerateDataForTestsNoSurvey($total=50)
+    {
         $tmpFile = tempnam(sys_get_temp_dir(), 'ks_parser');
         $fp = fopen($tmpFile, 'w');
 
         fputcsv($fp, ["Backer Number","Backer UID","Backer Name","Email","Pledge Amount","Pledged At","Pledged Status","Notes","Billing State/Province","Billing Country"]);
 
-        for($ii = 0; $ii < $total; $ii++){
+        for ($ii = 0; $ii < $total; $ii++) {
             fputcsv($fp, [
                 "Backer Number" => self::$faker->numberBetween(1, 9999),
                 "Backer UID" => self::$faker->randomNumber(9),

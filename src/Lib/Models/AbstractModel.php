@@ -31,9 +31,11 @@ abstract class AbstractModel
         return $this->properties->{$name};
     }
 
-    public function toArray(){
+    public function toArray()
+    {
         return array_merge(
-            ["uuid" => $this->UUID()], (array)$this->properties
+            ["uuid" => $this->UUID()],
+            (array)$this->properties
         );
     }
 

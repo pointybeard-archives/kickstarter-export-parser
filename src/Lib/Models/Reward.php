@@ -17,30 +17,32 @@ final class Reward extends AbstractModel
         ];
     }
 
-    private static function findFileNameFromStream($stream) {
+    private static function findFileNameFromStream($stream)
+    {
         $meta = stream_get_meta_data($stream);
         return pathinfo($meta['uri'], PATHINFO_FILENAME);
     }
 
-    private static function fetchRewardNameFromRecords(Lib\RecordIterator $records) {
+    private static function fetchRewardNameFromRecords(Lib\RecordIterator $records)
+    {
 
         // If Reward Title doesn't exist in the records,
         // try to determine a reward name by looking at the name of the
         // RecordIterator stream instead.
-        if(!isset($records->current()->RewardTitle)) {
+        if (!isset($records->current()->RewardTitle)) {
             return self::findFileNameFromStream($records->stream());
         }
 
         return $records->current()->RewardTitle;
     }
 
-    private static function fetchQuestionsFromHeaders(Lib\RecordIterator $records) {
+    private static function fetchQuestionsFromHeaders(Lib\RecordIterator $records)
+    {
         $questions = [];
 
         $offset = array_search('Survey Response', $records->headers());
 
         if ($offset != false) {
-
             $shippingCodeOfset = array_search('Shipping Country Code', $records->headers());
 
             // If the 'Shipping Country Code' key is set, it means this has
@@ -59,10 +61,10 @@ final class Reward extends AbstractModel
         return $questions;
     }
 
-    public function & findQuestionByUUID($uuid) {
-
-        for($ii = 0; $ii < count($this->questions()); $ii++){
-            if($this->properties->questions[$ii]->UUID() == $uuid) {
+    public function & findQuestionByUUID($uuid)
+    {
+        for ($ii = 0; $ii < count($this->questions()); $ii++) {
+            if ($this->properties->questions[$ii]->UUID() == $uuid) {
                 return $this->properties->questions[$ii];
             }
         }
@@ -70,10 +72,10 @@ final class Reward extends AbstractModel
         return null;
     }
 
-    public function & findQuestionByOriginalString($string) {
-
-        for($ii = 0; $ii < count($this->questions()); $ii++){
-            if($this->properties->questions[$ii]->original == $string) {
+    public function & findQuestionByOriginalString($string)
+    {
+        for ($ii = 0; $ii < count($this->questions()); $ii++) {
+            if ($this->properties->questions[$ii]->original == $string) {
                 return $this->properties->questions[$ii];
             }
         }
@@ -86,7 +88,8 @@ final class Reward extends AbstractModel
         return md5(self::findFileNameFromStream($this->records->stream()));
     }
 
-    public function addQuestion(Question $questions) {
+    public function addQuestion(Question $questions)
+    {
         $this->properties->questions[] = $questions;
     }
 
@@ -115,7 +118,8 @@ final class Reward extends AbstractModel
         return $this->properties->products[$sku] = $quantity;
     }
 
-    public function toArray(){
+    public function toArray()
+    {
         $result = [
             "file" => $this->file,
             "uuid" => $this->UUID(),
@@ -124,11 +128,10 @@ final class Reward extends AbstractModel
             "products" => $this->products()
         ];
 
-        foreach($this->questions() as $q) {
+        foreach ($this->questions() as $q) {
             $result['questions'][] = $q->toArray();
         }
 
         return $result;
-
     }
 }
