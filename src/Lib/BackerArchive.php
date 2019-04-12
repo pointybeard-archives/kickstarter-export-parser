@@ -6,7 +6,6 @@ use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 final class BackerArchive extends ZipArchiveExtended
 {
     private $rewards = null;
-    private $files = [];
     private $path = null;
 
     public function __construct($file)
@@ -18,19 +17,13 @@ final class BackerArchive extends ZipArchiveExtended
             );
         }
 
-        // Make sure the rewards array is populated
-        $this->rewards();
-
-        // This will create the reward iterators
-        $this->process();
-
         return true;
     }
 
     public function __destruct()
     {
-        foreach (array_keys($this->rewards) as $rewardUid) {
-            unset($this->rewards[$rewardUid]['reccords']);
+        for($ii = 0; $ii < count($this->rewards); $ii++) {
+            unset($this->rewards[$ii]->records);
         }
     }
 
@@ -39,21 +32,15 @@ final class BackerArchive extends ZipArchiveExtended
         return $this->path;
     }
 
-    private function process()
+    private function getRewardRecordsIterator($filename)
     {
         setlocale(LC_ALL, 'en_US.UTF8');
 
-        foreach ($this->files as $filename) {
-            if (!($fp = $this->getStream($filename))) {
-                throw new ZipArchiveException("Unable to load file contents into stream. {$filename}");
-            }
-            $rewardName = $this->rewardNameFromFileName($filename);
-            $rewardUid = $this->generateRewardUID($rewardName);
-
-            $this->rewards[$rewardUid]['records'] = new RecordIterator($fp);
+        if (!($fp = $this->getStream($filename))) {
+            throw new ZipArchiveException("Unable to load file contents into stream. {$filename}");
         }
 
-        return true;
+        return new RecordIterator($fp);
     }
 
     public function rewards()
@@ -63,27 +50,41 @@ final class BackerArchive extends ZipArchiveExtended
 
             // Iterate over each file to find the backer reward levels
             for ($ii = 0; $ii < $this->count(); ++$ii) {
-                $filename = $this->getNameIndex($ii);
-                $contents = $this->getFromIndex($ii);
-                $this->files[] = $filename;
-                $rewardName = $this->rewardNameFromFileName($filename);
-                $this->rewards[$this->generateRewardUID($rewardName)] = ['name' => $rewardName, 'records' => null];
+                $this->rewards[] = new Models\Reward(
+                    $this->getRewardRecordsIterator($this->getNameIndex($ii))
+                );
             }
         }
 
         return $this->rewards;
     }
 
-    private function generateRewardUID($rewardName)
-    {
-        return md5($rewardName);
+    public function & findRewardByUUID($uuid) {
+
+        for($ii = 0; $ii < count($this->rewards()); $ii++){
+            if($this->rewards[$ii]->UUID() == $uuid) {
+                return $this->rewards[$ii];
+            }
+        }
+
+        return null;
     }
 
-    private function rewardNameFromFileName($filename)
+    public function toArray() {
+        $result = [
+            "path" => $this->path,
+            "rewards" => []
+        ];
+
+        foreach($this->rewards() as $r) {
+            $result['rewards'][] = $r->toArray();
+        }
+
+        return $result;
+    }
+
+    public function toJson()
     {
-        // Removed the code that does the reward extraction as it is causing
-        // issues when Kickstarter change their filename formatting (fixes #4)
-        // https://github.com/pointybeard/kickstarter-export-parser/issues/4
-        return $filename;
+        return json_encode($this->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }
