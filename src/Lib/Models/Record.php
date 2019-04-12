@@ -2,9 +2,12 @@
 
 namespace pointybeard\Kickstarter\ExportParser\Lib\Models;
 
-class Record extends AbstractModel
+final class Record extends AbstractModel
 {
-    private $properties;
+
+    private static $currencyFields = [
+        'Pledge Amount', 'Reward Minimum', 'Shipping Amount'
+    ];
 
     private static $basicFields = [
         'Backer Number',
@@ -51,6 +54,10 @@ class Record extends AbstractModel
     public function setField($name, $value)
     {
 
+        if(!is_numeric($value) && in_array($name, self::$currencyFields)) {
+            $value = self::convertRawKickstarterCurrencyString($value);
+        }
+
         // Basic Fields
         if (in_array($name, self::$basicFields)) {
             $this->properties->basic[self::serialise($name)] = [
@@ -67,7 +74,7 @@ class Record extends AbstractModel
 
         // Non standard fields e.g. custom Q&A
         } else {
-            $this->properties->custom[self::generateRecordUID($name)] = [
+            $this->properties->custom[$this->UUID()] = [
                 'question' => $name,
                 'answer' => $value,
             ];
@@ -96,14 +103,14 @@ class Record extends AbstractModel
         ];
     }
 
+    public function UUID()
+    {
+        return $this->properties->BackerUID;
+    }
+
     public function toJson()
     {
         return json_encode($this->toArray(), JSON_PRETTY_PRINT);
-    }
-
-    public function generateRecordUID($recordName)
-    {
-        return md5($recordName);
     }
 
     public function __isset($name)
@@ -115,6 +122,11 @@ class Record extends AbstractModel
     public static function serialise($value)
     {
         return preg_replace('@[^a-zA-Z0-9]@', '', $value);
+    }
+
+    private static function convertRawKickstarterCurrencyString($amount)
+    {
+        return (float)preg_replace("@^[^\d]+@", '', $amount);
     }
 
     public function hasAnsweredSurvey()
@@ -159,7 +171,7 @@ class Record extends AbstractModel
     public function getSurveyAnswers()
     {
         if (!$this->hasAnsweredSurvey()) {
-            return false;
+            return [];
         }
 
         return $this->properties->custom;
