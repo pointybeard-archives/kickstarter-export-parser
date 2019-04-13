@@ -19,14 +19,15 @@ class BackerArchive extends ZipArchiveExtended
                 $res
             ));
         }
-
         return true;
     }
 
     public function __destruct()
     {
-        for ($ii = 0; $ii < count($this->rewards); $ii++) {
-            unset($this->rewards[$ii]->records);
+        if(!is_null($this->rewards)) {
+            for ($ii = 0; $ii < count($this->rewards); $ii++) {
+                unset($this->rewards[$ii]->records);
+            }
         }
     }
 
