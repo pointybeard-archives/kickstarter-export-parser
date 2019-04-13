@@ -109,7 +109,8 @@ final class Record extends AbstractModel
         $it->append(new \ArrayIterator($this->properties->custom));
 
         foreach ($it as $item) {
-            $result[$item['name']] = $item['value'];
+            list($key, $value) = array_values($item);
+            $result[$key] = $value;
         }
 
         return $result;
@@ -119,7 +120,7 @@ final class Record extends AbstractModel
 
     public function UUID()
     {
-        return $this->properties->BackerUID;
+        return $this->BackerUID;
     }
 
     public function __toString()
