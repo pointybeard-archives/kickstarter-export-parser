@@ -1,7 +1,7 @@
 # Kickstarter Export Parser
 
-- Version: v1.0.11
-- Date: April 6th 2019
+- Version: v1.0.12
+- Date: April 13th 2019
 - [Release notes](https://github.com/pointybeard/kickstarter-export-parser/blob/master/CHANGELOG.md)
 - [GitHub repository](https://github.com/pointybeard/kickstarter-export-parser)
 
@@ -27,12 +27,12 @@ $archive = new Lib\BackerArchive(
 
 foreach($archive->rewards() as $r){
     do{
-        $record = $r['records']->current();
+        $record = $r->records()->current();
 
         // ... do stuff with $record ...
 
-        $r['records']->next();
-    } while($r['records']->valid());
+        $r->records()->next();
+    } while($r->records()->valid());
 }
 
 $archive->close();
