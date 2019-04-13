@@ -29,7 +29,7 @@ class BackerArchiveTest extends TestCase
     {
         $this->expectException(ZipArchiveException::class);
         $this->expectExceptionMessage('Data does not appear to be valid CSV. Please check contents.');
-        new Lib\BackerArchive(__DIR__ . '/archives/valid-noncsv.zip');
+        (new Lib\BackerArchive(__DIR__ . '/archives/valid-noncsv.zip'))->rewards();
     }
 
     /**
@@ -59,7 +59,7 @@ class BackerArchiveTest extends TestCase
     public function testIterateOverRecords($archive) : void
     {
         foreach ($archive->rewards() as $r) {
-            $this->assertTrue($r['records'] instanceof Lib\RecordIterator);
+            $this->assertTrue($r->records() instanceof Lib\RecordIterator);
         }
         $archive->close();
     }

@@ -31,7 +31,7 @@ class RecordIteratorTest extends TestCase
 
     public function testIterateOverRecords() : Lib\Models\Record
     {
-        $it = current(self::$archive->Rewards())['records'];
+        $it = current(self::$archive->Rewards())->records();
 
         $this->assertTrue($it instanceof Lib\RecordIterator);
 
@@ -52,32 +52,12 @@ class RecordIteratorTest extends TestCase
 
     /**
      * @depends testIterateOverRecords
-     */
-    public function testValidRecord($record) : void
-    {
-        // Check the structure of the record now
-        $this->assertArrayHasKey('basic', $record->toArray(), 'Unable to locate `basic` of record array.');
-        $this->assertArrayHasKey('custom', $record->toArray(), 'Unable to locate `custom` of record array.');
-        $this->assertArrayHasKey('survey', $record->toArray(), 'Unable to locate `survey` of record array.');
-
-        $json = $record->toJson();
-        $json_decoded = json_decode($json);
-
-        $this->assertNotNull($json_decoded, 'Json could not be decoded.');
-
-        $this->assertTrue($json_decoded->basic instanceof \StdClass, 'Unable to locate ->basic of decoded record.');
-        $this->assertTrue($json_decoded->custom instanceof \StdClass, 'Unable to locate ->custom of decoded record.');
-        $this->assertTrue($json_decoded->survey instanceof \StdClass, 'Unable to locate ->survey of decoded record.');
-    }
-
-    /**
-     * @depends testIterateOverRecords
      * @param Lib/Models/Record $record
      */
     public function testRecordIsSet($record) : void
     {
-        $this->assertTrue(isset($record->BackerName), 'Basic value should be set');
-        $this->assertTrue(isset($record->RewardMinimum), 'Survey value should be set');
-        $this->assertFalse(isset($record->MissingKey), 'Missing key should not should be set');
+        $this->assertTrue(isset($record->BackerName), 'BackerName value should be set');
+        $this->assertTrue(isset($record->RewardMinimum), 'RewardMinimum value should be set');
+        $this->assertFalse(isset($record->MissingKey), 'MissingKey should not should be set');
     }
 }
