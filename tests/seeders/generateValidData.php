@@ -10,7 +10,7 @@ class generateValidData
         self::$faker = \Faker\Factory::create('en_AU');
     }
 
-    public function createValidCSVArchive($path, $totalRowsWithSurvey=50, $totalRowsWithoutSurvey=50)
+    public function createValidCSVArchive($path, $totalRowsWithSurvey=50, $totalRowsWithoutSurvey=50) : bool
     {
         $zip = new \ZipArchive;
         $res = $zip->open($path, \ZipArchive::CREATE);
@@ -37,7 +37,7 @@ class generateValidData
         return true;
     }
 
-    public function testGenerateDataForTestsWithSurvey($total=50)
+    public function testGenerateDataForTestsWithSurvey($total=50) : string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'ks_parser');
         $fp = fopen($tmpFile, 'w');
@@ -79,7 +79,7 @@ class generateValidData
         return $tmpFile;
     }
 
-    public function testGenerateDataForTestsNoSurvey($total=50)
+    public function testGenerateDataForTestsNoSurvey($total=50) : string
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'ks_parser');
         $fp = fopen($tmpFile, 'w');

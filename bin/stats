@@ -1,0 +1,187 @@
+#!/usr/bin/env php
+<?php
+function usage() {
+    printf (PHP_EOL . "stats 1.0.0, parses Kickstarter exports and produces statistics about the campaign
+    Usage: generate [OPTION]..
+
+Basics:
+  -h,  --help, --usage      print this help information
+  -d, --data                Path to either a single export .zip or a folder
+                            containing many .zip exports
+
+Examples:
+... stats --data=/path/to/file.zip" . PHP_EOL . PHP_EOL);
+    exit;
+}
+
+include __DIR__ . '/../vendor/autoload.php';
+
+use CLILib\Argument;
+use CLILib\Message;
+use CLILib\Prompt;
+
+use pointybeard\Kickstarter\ExportParser\Lib;
+
+$args = new Argument\Iterator;
+
+if ($args->find(['h', 'help', 'usage'])) {
+    usage();
+}
+
+$argData = $args->find(['d', 'data']);
+if (!($argData instanceof Argument) || strlen(trim($argData->value())) == 0) {
+    (new Message)
+        ->message("ERROR - No data provided. Use -d or --data to specify location of export zip files.")
+        ->prependDate(false)
+        ->foreground("red")
+        ->display()
+    ;
+    exit;
+}
+
+$paths = [];
+
+if(is_dir($argData->value())) {
+    foreach(new \RegexIterator(
+        new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($argData->value())
+        ),
+        '/^.+\.zip/i',
+        \RecursiveRegexIterator::GET_MATCH
+    ) as $match) {
+        $paths[] = $match[0];
+    }
+} elseif(is_file($argData->value())) {
+    $paths = [$argData->value()];
+} else {
+    (new Message)
+        ->message("ERROR - Path {$argData->value()} provided does not exist.")
+        ->prependDate(false)
+        ->foreground("red")
+        ->display()
+    ;
+    exit;
+}
+
+$stats = (object)[
+    "archives" => [],
+    "summary" => (object)[
+        'backers' => 0,
+        'funds' => 0,
+        'countries' => [],
+        'averagePledge' => null,
+        'pledgedAboveMinimum' => 0,
+        'answeredSurvey' => 0
+    ]
+];
+
+foreach($paths as $path) {
+
+    $archive = new Lib\BackerArchive(
+        $path
+    );
+
+    try {
+
+        $a = (object)[
+            "name" => pathinfo($path, PATHINFO_FILENAME),
+            "rewards" => [],
+            "summary" => (object)[
+                'backers' => 0,
+                'funds' => 0,
+                'countries' => [],
+                'averagePledge' => null,
+                'pledgedAboveMinimum' => 0,
+                'answeredSurvey' => 0
+            ]
+        ];
+
+        foreach($archive->rewards() as $r){
+            $s = (object)[
+                'name' => $r['name'],
+                'backers' => 0,
+                'funds' => 0,
+                'countries' => [],
+                'pledgedAboveMinimum' => 0
+            ];
+
+            foreach($r['records'] as $record) {
+
+                $record = $r['records']->current();
+
+                if(!isset($record->BillingCountry) || $record->BillingCountry == "pending until payout") {
+                    continue;
+                }
+
+                $s->backers++;
+                if(!isset($s->countries[$record->BillingCountry])){
+                    $s->countries[$record->BillingCountry] = 0;
+                }
+                $s->countries[$record->BillingCountry]++;
+
+                $s->funds += cleanKickstarterCurrencyAmount($record->PledgeAmount);
+
+                if(isset($record->SurveyResponse) && strlen(trim($record->SurveyResponse)) > 0) {
+                    $a->summary->answeredSurvey++;
+                }
+
+                if(isset($record->ShippingAmount)) {
+                    if((
+                        cleanKickstarterCurrencyAmount($record->PledgeAmount) -
+                        cleanKickstarterCurrencyAmount($record->ShippingAmount) -
+                        cleanKickstarterCurrencyAmount($record->RewardMinimum)) > 0) {
+                        $s->pledgedAboveMinimum++;
+                    }
+                };
+            }
+
+            $a->summary->backers += $s->backers;
+            $a->summary->funds += $s->funds;
+            $a->summary->countries = array_merge_sum($a->summary->countries, $s->countries);
+            $a->summary->pledgedAboveMinimum += $s->pledgedAboveMinimum;
+
+            $a->rewards[] = $s;
+        }
+        $archive->close();
+
+        $a->summary->averagePledge = formatNumberToSafeCurrency($a->summary->funds / max(1, $a->summary->backers));
+
+        $stats->archives[] = $a;
+
+    } catch (\Exception $ex) {
+        (new Message)
+            ->message(sprintf(
+                "ERROR - There was a problem . Returned: %s",
+                $ex->getMessage()
+            ))
+            ->prependDate(false)
+            ->foreground("red")
+            ->display()
+        ;
+    }
+}
+
+//Create a summary
+foreach($stats->archives as $archive) {
+    $stats->summary->backers += $archive->summary->backers;
+    $stats->summary->funds += $archive->summary->funds;
+    $stats->summary->countries = array_merge_sum($stats->summary->countries, $archive->summary->countries);
+    $stats->summary->pledgedAboveMinimum += $a->summary->pledgedAboveMinimum;
+    $stats->summary->answeredSurvey += $a->summary->answeredSurvey;
+}
+
+// Convert country counts into percentages
+foreach($stats->summary->countries as $code => $total) {
+    $stats->summary->countries[$code] = formatNumberToSafeCurrency(($total / $stats->summary->backers) * 100);
+}
+
+arsort($stats->summary->countries, SORT_NUMERIC);
+
+// Calulate the average pledge amount
+$stats->summary->averagePledge = formatNumberToSafeCurrency($stats->summary->funds / max(1, $stats->summary->backers));
+
+$stats->summary->pledgedAboveMinimum = formatNumberToSafeCurrency(($stats->summary->pledgedAboveMinimum / $stats->summary->backers) * 100);
+
+$stats->summary->answeredSurvey = formatNumberToSafeCurrency(($stats->summary->answeredSurvey / $stats->summary->backers) * 100);
+
+print json_encode($stats, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);

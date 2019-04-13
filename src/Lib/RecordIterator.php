@@ -77,10 +77,11 @@ class RecordIterator implements \Iterator
         return $this->stream;
     }
 
-    protected function fetchRow()
+    protected function fetchRow() : array
     {
         $row = fgetcsv($this->stream, $this->chunkSize);
-        if (count($row) == 1) {
+
+        if ($row === false || count($row) == 1) {
             throw new Exceptions\ZipArchiveException('Data does not appear to be valid CSV. Please check contents.');
         }
 
@@ -96,7 +97,7 @@ class RecordIterator implements \Iterator
      *
      * @return array
      */
-    public function headers()
+    public function headers() : array
     {
         return $this->headers;
     }
@@ -105,10 +106,9 @@ class RecordIterator implements \Iterator
      * Create a new instance of $this->className and by calling
      * the fetch() method on $this->statement;.
      *
-     * @param boolean $returnObject If set to false, this will return currentRaw instead of Models\Record instance
      * @return object
      */
-    public function current($returnObject=true)
+    public function current() : Models\Record
     {
         // Check if the lastPosition is different to the current position.
         // If it is, then get a new object and update lastPosition.
@@ -126,7 +126,7 @@ class RecordIterator implements \Iterator
             $this->lastPosition = $this->position;
         }
 
-        return ($returnObject ? $this->current : $this->currentRaw);
+        return $this->current;
     }
 
     /**
@@ -134,7 +134,7 @@ class RecordIterator implements \Iterator
      *
      * @return int
      */
-    public function key()
+    public function key() : int
     {
         return $this->position;
     }
@@ -145,7 +145,7 @@ class RecordIterator implements \Iterator
      *
      * @return bool
      */
-    public function next()
+    public function next() : bool
     {
         $this->position += $this->chunkSize;
 
@@ -156,7 +156,7 @@ class RecordIterator implements \Iterator
      * Executes the statement again, resetting the data and
      * changing the position to 0.
      */
-    public function rewind()
+    public function rewind() : bool
     {
         return true;
     }
@@ -167,7 +167,7 @@ class RecordIterator implements \Iterator
      *
      * @return bool
      */
-    public function valid()
+    public function valid() : bool
     {
         return !feof($this->stream);
     }

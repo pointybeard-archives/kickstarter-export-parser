@@ -1,18 +1,21 @@
 <?php
+declare(strict_types=1);
 namespace pointybeard\Kickstarter\ExportParser;
+
+use PHPUnit\Framework\TestCase;
 
 use pointybeard\Kickstarter\ExportParser\Lib\Exceptions\ZipArchiveException;
 use pointybeard\Kickstarter\ExportParser\Tests\Seeders;
 use pointybeard\Kickstarter\ExportParser\Lib;
 
-class RecordIteratorTest extends \PHPUnit_Framework_TestCase
+class RecordIteratorTest extends TestCase
 {
     private static $archive;
 
     /**
      * This is used to generate new, valid, CSV data.
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         // Create a small sample of data to iterate over.
         $archiveSeeder = new Seeders\generateValidData();
@@ -20,13 +23,13 @@ class RecordIteratorTest extends \PHPUnit_Framework_TestCase
         self::$archive = new Lib\BackerArchive(__DIR__ . '/archives/record-iterator-data.zip');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         self::$archive->close();
         unlink(__DIR__ . '/archives/record-iterator-data.zip');
     }
 
-    public function testIterateOverRecords()
+    public function testIterateOverRecords() : Lib\Models\Record
     {
         $it = current(self::$archive->Rewards())['records'];
 
@@ -37,9 +40,6 @@ class RecordIteratorTest extends \PHPUnit_Framework_TestCase
         do {
             $record = $it->current();
             $this->assertTrue($record instanceof Lib\Models\Record);
-
-            $recordRaw = $it->current(false);
-            $this->assertTrue(is_array($recordRaw));
 
             ++$count;
             $it->next();
@@ -53,7 +53,7 @@ class RecordIteratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testIterateOverRecords
      */
-    public function testValidRecord($record)
+    public function testValidRecord($record) : void
     {
         // Check the structure of the record now
         $this->assertArrayHasKey('basic', $record->toArray(), 'Unable to locate `basic` of record array.');
@@ -74,7 +74,7 @@ class RecordIteratorTest extends \PHPUnit_Framework_TestCase
      * @depends testIterateOverRecords
      * @param Lib/Models/Record $record
      */
-    public function testRecordIsSet($record)
+    public function testRecordIsSet($record) : void
     {
         $this->assertTrue(isset($record->BackerName), 'Basic value should be set');
         $this->assertTrue(isset($record->RewardMinimum), 'Survey value should be set');
